@@ -13,7 +13,6 @@ client = MongoClient('127.0.0.1', 27017)
 db = client['hh_ru']
 vacation_db = db.vacation_db
 
-
 def MongoDB():
 
     location = 20
@@ -68,4 +67,3 @@ def MongoDB():
 # if __name__ == '__main__':
 #     main()
 
-vacation_db.insert_one(MongoDB())
