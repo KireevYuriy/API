@@ -1,7 +1,6 @@
 from pymongo import MongoClient
 import requests
 from bs4 import BeautifulSoup
-import hashlib
 
 
 headers = {
@@ -9,17 +8,17 @@ headers = {
                   'Chrome/92.0.4515.159 Mobile Safari/537.36',
     'Accept': '*/*'
 }
-client = MongoClient('127.0.0.1', 27017)
-db = client['hh_ru']
-vacation_db = db.vacation_db
 
-def MongoDB():
 
+def mongo_db():
     location = 20
     vacation_inquiry = 'python'
     page = 0
-
     while True:
+        client = MongoClient('127.0.0.1', 27017)
+        db = client['hh_ru']
+        vacation_db = db.vacation_db
+
         url = f'https://hh.ru/search/vacancy?area={location}&text={vacation_inquiry.lower()}&page={page}'
         print(url)
         response = requests.get(url=url, headers=headers)
@@ -27,7 +26,6 @@ def MongoDB():
         soup = BeautifulSoup(src, 'lxml')
         all_vacation_info = soup.find_all('div', {'class': 'vacancy-serp-item'})
         try:
-            vacation_dict = []
             for vacation in all_vacation_info:
                 vacation_card = vacation.find('a')
                 vacation_name = vacation_card.text
@@ -44,8 +42,7 @@ def MongoDB():
                 else:
                     sal_min = int(sal_info[0].replace(u'\u202f', ''))
                     sal_max = int(sal_info[2].replace(u'\u202f', ''))
-
-                vacation_dict.append({
+                vacation_db.insert_one({
                     'Название вакансии': vacation_name,
                     'Ссылка на вакансию': vacation_href,
                     'Минимальная зарплата': sal_min,
@@ -60,10 +57,6 @@ def MongoDB():
 
         if not soup.find(text='дальше'):
             break
-    return vacation_dict
-    # with open('vacation_data.json', "w+", encoding="utf-8") as file:
-    #     json.dump(vacation_dict, file, indent=4, ensure_ascii=False)
 
-# if __name__ == '__main__':
-#     main()
 
+mongo_db()
