@@ -10,5 +10,4 @@ with open('result.json', 'w') as f:
     json.dump(inquiry.json(), f)
 for elem in inquiry.json():
     print(elem['name'])
-
 #pprint(inquiry.json())
